@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt_BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora</title>
+    <link rel="shortcut icon" href="https://cdn.dribbble.com/users/3777481/screenshots/10572704/ios-app-calculator.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #container {
+            width: 100vw;
+            height: 100vh;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center
+        }
+
+        #calculadora {
+            background: white;
+            font-family: sans-serif;
+            padding: 20px;
+            font-size: 38px;
+            background-color: black;
+        }
+
+        #tabela {
+            width: 406px;
+            max-width: 406px;
+            height: 600px;
+            max-height: 600px;
+            text-align: center;
+            border-spacing: 10px;
+        }
+
+
+        #saida {
+            width: 100%;
+            height: 100%;
+            font-size: 50px;
+            text-align: right;
+            background-color: black;
+            border: none;
+            color: transparent;
+            text-shadow: 0 0 0 #ffffff
+        }
+
+        #saida:focus {
+            box-shadow: 0 0 0 0;
+            border: 0 none;
+            outline: 0;
+        }
+
+        .display {
+            height: 4.2rem;
+            max-height: 4.2rem;
+            margin-bottom: 20px;
+        }
+
+        .botao {
+            width: 4.2rem;
+            height: 4.2rem;
+            border-radius: 50%;
+        }
+
+        .botao0 {
+            border-radius: 50px;
+            text-align: left;
+            padding-left: 35px;
+        }
+
+        .botao:hover,
+        .botao0:hover {
+            cursor: pointer;
+        }
+
+        .botaoCinza {
+            background-color: #A6A6A6;
+        }
+
+        .botaoCinza:hover {
+            background: rgb(166, 166, 166, 0.8);
+        }
+
+        .botaoLaranja {
+            background: #FF9501;
+            color: white;
+        }
+
+        .botaoLaranja:hover {
+            background: rgb(255, 149, 1, 0.8);
+            cursor: pointer;
+        }
+
+        .botaoCinzaEscuro {
+            background: #333333;
+            color: white;
+        }
+
+        .botaoCinzaEscuro:hover {
+            background: rgb(51, 51, 51, 0.8);
+            cursor: pointer;
+        }
+
+        .botaoClicadoLaranja {
+            background-color: white;
+            color: #FF9501;
+        }
+
+        .botaoClicadoLaranja:hover {
+            background-color: white;
+            color: #FF9501;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="calculadora">
+            <table id="tabela">
+                <tr>
+                    <td colspan="4" class="display"><input type="text" id="saida" autofocus value="0" disabled
+                            maxlength="14"></td>
+                </tr>
+                <tr>
+                    <td class="botao Clear botoesRedondos botaoCinza" id="btnClear">AC</td>
+                    <td class="botao TrocarSinal botoesRedondos botaoCinza" id="btnMudarSinal">+/-</td>
+                    <td class="botao Sinais botoesRedondos botaoCinza" id="btnModulo">%</td>
+                    <td class="botao Sinais botoesRedondos botaoLaranja" id="btnDiv">÷</td>
+                </tr>
+                <tr>
+                    <td class="botao Num botoesRedondos botaoCinzaEscuro" id="btn7">7</td>
+                    <td class="botao Num botoesRedondos botaoCinzaEscuro" id="btn8">8</td>
+                    <td class="botao Num botoesRedondos botaoCinzaEscuro" id="btn9">9</td>
+                    <td class="botao Sinais botoesRedondos botaoLaranja" id="btnMulti">×</td>
+                </tr>
+                <tr>
+                    <td class="botao Num botoesRedondos botaoCinzaEscuro" id="btn4">4</td>
+                    <td class="botao Num botoesRedondos botaoCinzaEscuro" id="btn5">5</td>
+                    <td class="botao Num botoesRedondos botaoCinzaEscuro" id="btn6">6</td>
+                    <td class="botao Sinais botoesRedondos botaoLaranja" id="btnSub">-</td>
+                </tr>
+                <tr>
+                    <td class="botao Num botoesRedondos botaoCinzaEscuro" id="btn1">1</td>
+                    <td class="botao Num botoesRedondos botaoCinzaEscuro" id="btn2">2</td>
+                    <td class="botao Num botoesRedondos botaoCinzaEscuro" id="btn3">3</td>
+                    <td class="botao Sinais botoesRedondos botaoLaranja" id="btnSoma">+</td>
+                </tr>
+                <tr>
+                    <td class="botao Num botao0 botaoCinzaEscuro" colspan="2" id="btn0">0</td>
+                    <td class="botao Num botoesRedondos botaoCinzaEscuro" id="btnPonto">.</td>
+                    <td class="botao Igual botaoLaranja" id="btnIgual">=</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <script>
+        let saida = document.querySelector("#saida")
+        let calculadora = document.querySelector("#calculadora")
+        let elemento1, elemento2
+        let saidaVazia = true
+        let adicionarPrimeiroElemento = true
+        let primeiroSinal = true
+        let funcao = ""
+        let quantidadeSinais = 0
+        let primeiroCaracter = true
+        let existeSinalAnterior = true
+        let sinalEstaClicado = false
+        let numeroFoiClicado = false
+        let modulo = false
+        let quantidadeDeElementos = 0
+
+        function removerClassesCores() { //Função para remover as cores de quando o botão for clicado
+            let btsSinais = document.querySelectorAll(".Sinais")
+            for (botao of btsSinais) {
+                botao.classList.remove("botaoClicadoLaranja")
+            }
+        }
+
+        //Evento para escutar o click no botão de apagar
+        document.addEventListener("keydown", function (e) {
+            let key = e.key
+            if (key == "Backspace") {
+                saida.value = saida.value.slice(0, -1)
+                if (saida.value == "") {
+                    saida.value = 0
+                    saidaVazia = true
+                }
+            }
+        })
+
+
+        //Evento para saber qual botão foi clicado
+        document.addEventListener("click", function (e) {
+            const el = e.target;
+
+            if (el.classList.contains("Num")) { //Entra aqui caso seja um número ou o '.'
+                let numero = el.innerText
+                if (numero == ".") {
+                    if (saida.value.indexOf(".") == -1) {
+                        adicionaNumeroSaida(numero)
+                    }
+                } else {
+                    adicionaNumeroSaida(numero)
+                }
+
+            } else if (el.classList.contains("Sinais")) { //Entra aqui caso seja um sinal
+                removerClassesCores()
+                let sinal = el.innerText
+                if (sinal != "%") {
+                    el.classList.add("botaoClicadoLaranja")
+                } else { //Se o sinal for %, ele substitui por pela equivalência, ou seja /100
+                    sinal = "/100"
+                    modulo = true
+                }
+
+                //Entra aqui caso seja clicado o botão menos para iniciar escrevendo um número negativo
+                if (primeiroCaracter && sinal == "-") {
+                    saida.value = "-"
+                    primeiroCaracter = false
+                    saidaVazia = false
+                    return
+                } else if (sinal == "×") { //Troca o sinal exibido pela calculadora pelo equivalente do JS
+                    sinal = "*"
+                } else if (sinal == "÷") { //Troca o sinal exibido pela calculadora pelo equivalente do JS
+                    sinal = "/"
+                }
+                cliqueSinais(sinal)
+            } else if (el.classList.contains("Igual") && !adicionarPrimeiroElemento && quantidadeSinais != 0) {
+                igual() //Entra aqui caso seja '='
+            } else if (el.classList.contains("Clear")) {
+                limparSaida() //Entra aqui caso seja no 'AC'
+            } else if (el.classList.contains("TrocarSinal")) {
+                trocarSinal() //Entra aqui caso seja no '+/-'
+            }
+        })
+
+        //Função caso seja clicado no botão "+/-"
+        function trocarSinal() {
+            let valor
+            if (adicionarPrimeiroElemento) {
+                valor = Number(saida.value)
+            } else if (saidaVazia) {
+                valor = Number(funcao)
+                saida.value = `${valor * -1}`
+                funcao = saida.value
+                return
+
+            } else {
+                valor = Number(saida.value)
+            }
+
+            saida.value = `${valor * -1}`
+        }
+
+        //Função caso o botão AC seja clicado, reinicia todas as variáveis
+        function limparSaida() {
+            saida.value = 0
+            saidaVazia = true
+            adicionarPrimeiroElemento = true
+            primeiroSinal = true
+            funcao = ""
+            quantidadeSinais = 0
+            primeiroCaracter = true
+            existeSinalAnterior = true
+            sinalEstaClicado = false
+            numeroFoiClicado = false
+            modulo = false
+            quantidadeDeElementos = 0
+        }
+
+        //Adiciona número no display, num limite máximo de 14 carácteres, tamanho máximo do display
+        function adicionaNumeroSaida(num) {
+            sinalEstaClicado = false
+            primeiroCaracter = false
+            numeroFoiClicado = true
+            if (saida.value.length < 14) {
+                if (saidaVazia) {
+                    saida.value = ""
+                    saidaVazia = false
+                }
+
+                removerClassesCores()
+                saida.value += num
+            }
+        }
+
+        //Função caso um sinal seja clicado
+        function cliqueSinais(key) {
+            quantidadeSinais++
+
+            if (quantidadeSinais > 1 && existeSinalAnterior && numeroFoiClicado) {
+                if (sinalEstaClicado) {
+                    return
+                }
+                adicionaNoElemento()
+                funcao += elemento2
+                funcao = eval(funcao)
+                saida.value = funcao
+                funcao += key
+                if (modulo) {
+                    funcao = eval(funcao)
+                    saida.value = funcao
+                    modulo = false
+                }
+                quantidadeDeElementos = 1
+                adicionarPrimeiroElemento = false
+                saidaVazia = true
+                sinalEstaClicado = true
+                numeroFoiClicado = false
+                return
+            }
+
+            //Entra aqui caso já exista um sinal ja foi clicado anteriormente, então apaga o último sinal
+            if (!primeiroSinal && !numeroFoiClicado) {
+                funcao = funcao.slice(0, -1)
+                quantidadeSinais--
+            }
+
+            //Entra aqui caso seja o primeiro sinal adicionado
+            if (primeiroSinal) {
+                existeSinalAnterior = true
+                primeiroCaracter = false
+                adicionaNoElemento();
+                funcao = `${elemento1 + key}`
+                adicionarPrimeiroElemento = false
+                primeiroSinal = false
+                saidaVazia = true
+                numeroFoiClicado = false
+            } else {
+                funcao += key
+                existeSinalAnterior = true
+                saidaVazia = true
+                adicionarPrimeiroElemento = false
+                numeroFoiClicado = false
+            }
+        }
+
+        //Função para adicionar um número no elemento, "primeira parte da função"
+        function adicionaNoElemento() {
+            if (adicionarPrimeiroElemento) {
+                elemento1 = `(${saida.value})`
+                quantidadeDeElementos++
+            } else {
+                elemento2 = `(${saida.value})`
+                quantidadeDeElementos++
+            }
+        }
+
+        //Função para resolver o sinal de igual
+        function igual() {
+            existeSinalAnterior = false
+            quantidadeSinais = 0
+            adicionaNoElemento()
+            funcao += elemento2
+            funcao = eval(funcao) //Eval "resolve" uma string
+            funcao = `${funcao}`
+            saida.value = funcao
+            elemento1 = `(${funcao})`
+            saidaVazia = true
+            quantidadeDeElementos = 1
+        }
+    </script>
+</body>
+
+</html>
